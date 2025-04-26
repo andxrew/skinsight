@@ -67,9 +67,10 @@ import {
 	Text,
 	TextInput,
 	SafeAreaView,
-	Image,
 	TouchableOpacity,
 } from "react-native"
+
+import { Bell, Search } from "lucide-react-native" // ✅ Import Lucide icons
 
 const HomeHeader = () => {
 	const today = new Date()
@@ -82,22 +83,37 @@ const HomeHeader = () => {
 	const formattedDate = today.toLocaleDateString("en-US", options)
 
 	return (
-		<View className="bg-accent w-full h-60 rounded-bl-3xl rounded-br-3xl pt-10 px-5">
+		<View className="bg-accent w-full h-64 rounded-b-3xl pt-20 px-5">
 			<SafeAreaView className="flex-1">
 				{/* Date and Notification */}
 				<View className="flex-row justify-between items-center mb-4">
 					<Text className="text-white text-lg">{formattedDate}</Text>
-					<TouchableOpacity>
-						<Text className="text-white text-2xl">🔔</Text>
+					{/* Notification Icon with Badge */}
+					<TouchableOpacity className="relative">
+						<View className="bg-accentSoft rounded-full p-2">
+							<Bell
+								color="white"
+								size={28}
+								strokeWidth={2}
+							/>
+
+							{/* Notification Badge */}
+							<View className="absolute -top-1 -right-1 bg-red-500 rounded-full w-4 h-4 items-center justify-center">
+								<Text className="text-white text-[10px] font-bold">3</Text>
+							</View>
+						</View>
 					</TouchableOpacity>
 				</View>
 
 				{/* Greeting */}
 				<View className="flex-row items-center">
-					{/* <Image
-						source={{ uri: "https://randomuser.me/api/portraits/women/44.jpg" }}
-						className="w-12 h-12 rounded-full mr-3"
-					/> */}
+					{/* Optional Profile Picture */}
+					{/* 
+            <Image
+              source={{ uri: "https://randomuser.me/api/portraits/women/44.jpg" }}
+              className="w-12 h-12 rounded-full mr-3"
+            /> 
+            */}
 					<View>
 						<Text className="text-white text-2xl font-semibold">
 							Hi, User! 👋
@@ -106,11 +122,16 @@ const HomeHeader = () => {
 				</View>
 
 				{/* Search Bar */}
-				<View className="flex-row items-center  bg-accentSoft rounded-full px-4 py-2 mt-4">
+				<View className="flex-row items-center bg-accentSoft rounded-full px-4 py-2 mt-4">
+					<Search
+						color="#F0F4FF"
+						size={20}
+						strokeWidth={2}
+					/>
 					<TextInput
 						placeholder="Search Skinsight..."
 						placeholderTextColor="#F0F4FF"
-						className="flex-1 text-white text-base"
+						className="flex-1 text-white text-base ml-2"
 					/>
 				</View>
 			</SafeAreaView>
