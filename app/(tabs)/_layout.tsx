@@ -7,8 +7,8 @@ import { icons } from "@/constants/icons"
 const TabIcon = ({ focused, icon, title }: any) => {
 	if (focused) {
 		return (
-			<View
-				// source={images.highlight}
+			<ImageBackground
+				source={images.highlight}
 				className="flex flex-row w-full flex-1 min-w-[112px] min-h-16 mt-4 justify-center items-center rounded-full overflow-hidden"
 			>
 				<Image
@@ -19,7 +19,7 @@ const TabIcon = ({ focused, icon, title }: any) => {
 				<Text className="text-secondary text-base font-semibold ml-2">
 					{title}
 				</Text>
-			</View>
+			</ImageBackground>
 		)
 	}
 
@@ -27,7 +27,7 @@ const TabIcon = ({ focused, icon, title }: any) => {
 		<View className="size-full justify-center items-center mt-4 rounded-full">
 			<Image
 				source={icon}
-				tintColor="#4169E1"
+				tintColor="#6C8CFF"
 				className="size-5"
 			/>
 		</View>
@@ -55,6 +55,7 @@ const _layout = () => {
 					overflow: "hidden",
 					borderWidth: 1,
 					borderColor: "#F0F4FF",
+					shadowOpacity: 0,
 				},
 			}}
 		>
