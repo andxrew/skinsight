@@ -19,7 +19,7 @@ export default function Index() {
 		skinHealthTips[Math.floor(Math.random() * skinHealthTips.length)]
 
 	return (
-		<View className="flex-1 ">
+		<View className="flex-1 bg-background">
 			<ScrollView
 				showsVerticalScrollIndicator={false}
 				contentContainerStyle={{ paddingBottom: 20 }}

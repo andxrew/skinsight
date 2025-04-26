@@ -51,7 +51,7 @@ export default function Layout() {
 					alignItems: "center",
 				},
 				tabBarStyle: {
-					backgroundColor: "#F9FAFB",
+					backgroundColor: "#F0F4FF",
 					borderRadius: 50,
 					marginHorizontal: 20,
 					marginBottom: 36,
@@ -61,10 +61,10 @@ export default function Layout() {
 					borderWidth: 0,
 					borderColor: "#F0F4FF",
 					shadowOpacity: 0.1,
-					shadowColor: "#000",
-					shadowOffset: { width: 0, height: 5 },
-					shadowRadius: 10,
-					elevation: 5,
+					// shadowColor: "#000",
+					// shadowOffset: { width: 0, height: 5 },
+					// shadowRadius: 10,
+					// elevation: 5,
 				},
 				// tabBarBackground: () => (
 				// 	<BlurView

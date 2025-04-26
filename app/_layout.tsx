@@ -8,6 +8,19 @@ export default function RootLayout() {
 				name="(tabs)"
 				options={{ headerShown: false }}
 			/>
+			{/* Special Flow Pages */}
+			<Stack.Screen
+				name="preview"
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="analyzing"
+				options={{ headerShown: false }}
+			/>
+			<Stack.Screen
+				name="results"
+				options={{ headerShown: false }}
+			/>
 		</Stack>
 	)
 }
