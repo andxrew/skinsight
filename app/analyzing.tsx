@@ -74,7 +74,7 @@ export default function Analyzing() {
 	}
 
 	return (
-		<SafeAreaView className="flex-1 bg-background justify-center items-center px-6">
+		<SafeAreaView className="flex-1 bg-background dark:bg-black justify-center items-center px-6">
 			<ActivityIndicator
 				size="large"
 				color="#4169E1"
@@ -84,7 +84,7 @@ export default function Analyzing() {
 				Analyzing your scan...
 			</Text>
 
-			<Text className="text-textSecondary text-center mt-4">
+			<Text className="text-textSecondary dark:text-gray-400 text-center mt-4">
 				{funnyMessage}
 			</Text>
 		</SafeAreaView>

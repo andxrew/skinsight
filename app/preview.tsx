@@ -13,18 +13,18 @@ export default function Preview() {
 	const { imageUri } = useLocalSearchParams<{ imageUri: string }>()
 
 	const handleRetake = () => {
-		router.replace("/scan") // ✅ Forcefully go to Scan page
+		router.replace("/scan")
 	}
 
 	const handleConfirm = () => {
 		router.push({
 			pathname: "/analyzing",
 			params: { imageUri },
-		}) // 🚀 (we'll build this analyzing page next)
+		})
 	}
 
 	return (
-		<SafeAreaView className="flex-1 bg-background">
+		<SafeAreaView className="flex-1 bg-background dark:bg-black">
 			<ScrollView>
 				{/* Captured Image */}
 				<View className="flex-1 items-center justify-center px-5 mt-10">
@@ -35,22 +35,24 @@ export default function Preview() {
 							resizeMode="contain"
 						/>
 					) : (
-						<Text className="text-textPrimary">No Image Found</Text>
+						<Text className="text-textPrimary dark:text-white">
+							No Image Found
+						</Text>
 					)}
 				</View>
 
 				{/* Buttons */}
-				<View className="flex-row justify-around mb-10 px-6 ">
+				<View className="flex-row justify-around mb-10 px-6">
 					{/* Retake Button */}
 					<TouchableOpacity
-						className="bg-surface py-4 px-6 rounded-full flex-1 mr-2 items-center"
+						className="bg-surface dark:bg-[#1a1a1a] py-4 px-6 rounded-full flex-1 mr-2 items-center"
 						onPress={handleRetake}
 					>
 						<ArrowLeft
 							color="#4169E1"
 							size={28}
 						/>
-						<Text className="text-textPrimary font-bold text-lg mt-2">
+						<Text className="text-textPrimary dark:text-white font-bold text-lg mt-2">
 							Retake
 						</Text>
 					</TouchableOpacity>

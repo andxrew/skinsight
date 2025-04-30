@@ -5,7 +5,6 @@ import { CheckCircle, XCircle } from "lucide-react-native"
 import { saveScanResult } from "@/utils/HistoryDatabase"
 import * as Crypto from "expo-crypto"
 
-// --- HELPERS ---
 async function generateUUID() {
 	return Crypto.randomUUID()
 }
@@ -26,7 +25,6 @@ export default function Results() {
 			return
 		}
 
-		// Capitalize first letter to match "Benign" | "Malignant"
 		const formattedResult =
 			result.charAt(0).toUpperCase() + result.slice(1).toLowerCase()
 
@@ -36,8 +34,6 @@ export default function Results() {
 		}
 
 		setDiagnosis(formattedResult as "Benign" | "Malignant")
-
-		// Save to DB
 		;(async () => {
 			try {
 				const id = await generateUUID()
@@ -60,7 +56,7 @@ export default function Results() {
 	}
 
 	return (
-		<SafeAreaView className="flex-1 bg-background justify-center items-center px-6">
+		<SafeAreaView className="flex-1 bg-background dark:bg-black justify-center items-center px-6">
 			{/* Scanned Image */}
 			<Image
 				source={{ uri: imageUri }}
@@ -91,7 +87,7 @@ export default function Results() {
 			</Text>
 
 			{/* Confidence */}
-			<Text className="text-textSecondary text-lg text-center mt-4">
+			<Text className="text-textSecondary dark:text-gray-400 text-lg text-center mt-4">
 				Confidence: {parseFloat(confidence).toFixed(2)}%
 			</Text>
 
@@ -101,6 +97,14 @@ export default function Results() {
 				onPress={handleNewScan}
 			>
 				<Text className="text-white text-lg font-bold">Start New Scan</Text>
+			</TouchableOpacity>
+
+			{/* View History Button */}
+			<TouchableOpacity
+				className="mt-4 py-4 px-8 rounded-2xl border-2 border-accent"
+				onPress={() => router.push("/history")}
+			>
+				<Text className="text-accent text-lg font-bold">View History</Text>
 			</TouchableOpacity>
 		</SafeAreaView>
 	)

@@ -28,27 +28,29 @@ export default function Index() {
 				<HomeHeader />
 
 				{/* Content Area */}
-				<View className="px-5 flex-1">
+				<View className="px-5 flex-1 mt-10">
 					{/* Welcome Message */}
-					<Text className="text-3xl font-bold dark:text-white text-accent text-center mb-6 mt-4">
-						Skinsight
-					</Text>
+					{/* <Text className="text-3xl font-bold dark:text-white text-accent text-center mb-6 mt-4">
+						Welcome to Skinsight! 👋
+					</Text> */}
 
 					{/* Last Scan Result */}
 					<View className="bg-surface dark:bg-[#1a1a1a] rounded-2xl p-5 mb-6 shadow">
-						<Text className="text-lg font-semibold text-textPrimary dark:text-white mb-2">
+						<Text className="text-lg text-center font-semibold text-textPrimary dark:text-white mb-2">
 							🩺 Last Scan
 						</Text>
-						<Text className="text-2xl font-bold text-success">Benign</Text>
+						<Text className="text-2xl font-bold text-success text-center">
+							Benign
+						</Text>
 						<TouchableOpacity className="mt-3">
-							<Text className="text-accent">View Full Report</Text>
+							<Text className="text-accent text-center">View Full Report</Text>
 						</TouchableOpacity>
 					</View>
 
 					{/* Health Tip */}
 					<View className="bg-surface dark:bg-[#1a1a1a] p-5 rounded-2xl mb-6 shadow">
 						<Text className="text-lg text-center font-bold text-textPrimary dark:text-white mb-2">
-							🧠 Skin Health Tip
+							🧠 Skinsight Health Tip
 						</Text>
 						<Text className="text-textSecondary dark:text-gray-400 text-center">
 							{randomTip}
