@@ -87,7 +87,9 @@ const HomeHeader = () => {
 			<SafeAreaView className="flex-1">
 				{/* Date and Notification */}
 				<View className="flex-row justify-between items-center mb-4">
-					<Text className="text-white text-lg">{formattedDate}</Text>
+					<Text className="text-white text-lg font-semibold">
+						{formattedDate}
+					</Text>
 					{/* Notification Icon with Badge */}
 					<TouchableOpacity className="relative">
 						<View className="bg-accentSoft rounded-full p-2">

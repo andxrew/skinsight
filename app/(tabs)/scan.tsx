@@ -30,7 +30,6 @@ export default function Scan() {
 	const handleCapture = async () => {
 		const photo = await ref.current?.takePictureAsync()
 		if (photo?.uri) {
-			console.log("Captured photo URI:", photo.uri)
 			router.push({
 				pathname: "/preview",
 				params: { imageUri: photo.uri },
@@ -47,7 +46,6 @@ export default function Scan() {
 		})
 
 		if (!result.canceled && result.assets[0]?.uri) {
-			console.log("Selected image:", result.assets[0].uri)
 			router.push({
 				pathname: "/preview",
 				params: { imageUri: result.assets[0].uri },
@@ -62,8 +60,8 @@ export default function Scan() {
 	if (!permission) return <View />
 	if (!permission.granted) {
 		return (
-			<SafeAreaView className="flex-1 justify-center items-center bg-background">
-				<Text className="text-textPrimary mb-4">
+			<SafeAreaView className="flex-1 justify-center items-center bg-background dark:bg-black">
+				<Text className="text-textPrimary dark:text-white mb-4">
 					We need camera permission to continue.
 				</Text>
 				<TouchableOpacity
@@ -77,7 +75,7 @@ export default function Scan() {
 	}
 
 	return (
-		<SafeAreaView className="flex-1 bg-background">
+		<SafeAreaView className="flex-1 bg-background dark:bg-black">
 			<ScrollView
 				className="flex-1"
 				contentContainerStyle={{ paddingBottom: 20 }}
@@ -85,13 +83,13 @@ export default function Scan() {
 			>
 				{/* Title */}
 				<View className="px-5 pt-8">
-					<Text className="text-3xl font-bold text-accent text-center mb-6">
+					<Text className="text-3xl font-bold text-accent dark:text-white text-center mb-6">
 						Scan a Skin Lesion
 					</Text>
 				</View>
 
 				{/* Camera View */}
-				<View className="h-[450px] overflow-hidden rounded-3xl mx-5 mb-6">
+				<View className="h-[450px] overflow-hidden rounded-3xl mx-5 mb-6 border border-gray-200 dark:border-gray-700">
 					<CameraView
 						ref={ref}
 						facing={facing}
@@ -102,7 +100,6 @@ export default function Scan() {
 					>
 						{/* Overlay buttons */}
 						<View className="absolute bottom-6 w-full flex-row justify-around items-center px-8">
-							{/* Flip Camera */}
 							<TouchableOpacity
 								className="bg-white/30 p-4 rounded-full"
 								onPress={toggleCameraFacing}
@@ -113,7 +110,6 @@ export default function Scan() {
 								/>
 							</TouchableOpacity>
 
-							{/* Capture Button */}
 							<TouchableOpacity
 								className="bg-accent p-6 rounded-full"
 								onPress={handleCapture}
@@ -124,7 +120,6 @@ export default function Scan() {
 								/>
 							</TouchableOpacity>
 
-							{/* Flashlight Toggle */}
 							<TouchableOpacity
 								className={`p-4 rounded-full ${
 									flashOn ? "bg-yellow-400/40" : "bg-white/30"
@@ -158,16 +153,16 @@ export default function Scan() {
 
 				{/* Scan Tips */}
 				<View className="px-5 mb-6">
-					<Text className="text-textPrimary text-center font-semibold mb-2">
+					<Text className="text-textPrimary dark:text-white text-center font-semibold mb-2">
 						📋 Tips for Best Scan:
 					</Text>
-					<Text className="text-textSecondary text-center">
+					<Text className="text-textSecondary dark:text-gray-400 text-center">
 						- Use good lighting
 					</Text>
-					<Text className="text-textSecondary text-center">
+					<Text className="text-textSecondary dark:text-gray-400 text-center">
 						- Get a clear, close-up photo
 					</Text>
-					<Text className="text-textSecondary text-center">
+					<Text className="text-textSecondary dark:text-gray-400 text-center">
 						- Avoid makeup or filters
 					</Text>
 				</View>

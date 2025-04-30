@@ -1,21 +1,8 @@
-import { View, Text, ImageBackground, Image } from "react-native"
+import { View, Text } from "react-native"
 import React from "react"
 import { Tabs } from "expo-router"
-import { images } from "@/constants/images"
-import { icons } from "@/constants/icons"
-// import { Home, Camera, LineChart, Settings } from "lucide-react-native"
-// import {} from "module"
-// import { Home, Camera, Activity, Settings } from "react-native-feather" // feather icons!
-import {
-	Home,
-	Camera,
-	LineChart,
-	Settings,
-	SearchCheck,
-	BookOpenCheck,
-} from "lucide-react-native"
-
-import { BlurView } from "expo-blur"
+import { Home, SearchCheck, BookOpenCheck, Settings } from "lucide-react-native"
+import { useTheme } from "@/components/ThemeContext"
 
 const TabIcon = ({
 	focused,
@@ -26,54 +13,47 @@ const TabIcon = ({
 	Icon: any
 	label: string
 }) => {
+	const { theme } = useTheme() // access current theme from context
+
+	const iconColor = focused
+		? theme === "dark"
+			? "#7F9DFF" // focused white in dark mode
+			: "#4169E1" // accent in light mode
+		: theme === "dark"
+		? "#6B7280" // gray-500
+		: "#9CA3AF" // gray-400
+
 	return (
 		<View className="items-center justify-center mt-2">
 			<Icon
-				color={focused ? "#4169E1" : "#9ca3af"}
 				size={24}
 				strokeWidth={focused ? 3 : 2}
+				color={iconColor}
 			/>
-			{/* Optional: Label under icon */}
-			{/* <Text className={`text-xs mt-1 ${focused ? "text-accent" : "text-gray-400"}`}>{label}</Text> */}
 		</View>
 	)
 }
 
 export default function Layout() {
+	const { theme } = useTheme() // 👈 used for dynamic tab bar style
+
 	return (
 		<Tabs
 			screenOptions={{
 				tabBarShowLabel: false,
-				tabBarItemStyle: {
-					width: 100,
-					height: 100,
-					justifyContent: "center",
-					alignItems: "center",
-				},
 				tabBarStyle: {
-					backgroundColor: "#F0F4FF",
+					backgroundColor: theme === "dark" ? "#1A2440" : "#F0F4FF",
 					borderRadius: 50,
+					borderColor: theme === "dark" ? "#7F9DFF" : "#4169E1",
 					marginHorizontal: 20,
 					marginBottom: 36,
 					height: 52,
 					position: "absolute",
 					overflow: "hidden",
-					borderWidth: 0,
-					borderColor: "#F0F4FF",
-					shadowOpacity: 0.1,
-					// shadowColor: "#000",
-					// shadowOffset: { width: 0, height: 5 },
-					// shadowRadius: 10,
-					// elevation: 5,
+					borderWidth: 2,
+					shadowOpacity: 0,
+					borderTopWidth: 2,
 				},
-				// tabBarBackground: () => (
-				// 	<BlurView
-				// 		intensity={70}
-				// 		tint="light" // You can use 'dark' for dark mode
-				// 		className="flex-1"
-				// 		style={{ borderRadius: 0 }}
-				// 	/>
-				// ),
 			}}
 		>
 			<Tabs.Screen
@@ -134,30 +114,4 @@ export default function Layout() {
 			/>
 		</Tabs>
 	)
-}
-
-{
-	/* <Tabs
-			screenOptions={{
-				tabBarShowLabel: false,
-				tabBarItemStyle: {
-					width: 100,
-					height: 100,
-					justifyContent: "center",
-					alignItems: "center",
-				},
-				tabBarStyle: {
-					backgroundColor: "#F0F4FF",
-					borderRadius: 50,
-					marginHorizontal: 20,
-					marginBottom: 36,
-					height: 52,
-					position: "absolute",
-					overflow: "hidden",
-					borderWidth: 1,
-					borderColor: "#F0F4FF",
-					shadowOpacity: 0,
-				},
-			}}
-		> */
 }
