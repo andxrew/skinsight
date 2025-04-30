@@ -83,7 +83,7 @@ const HomeHeader = () => {
 	const formattedDate = today.toLocaleDateString("en-US", options)
 
 	return (
-		<View className="bg-accent w-full h-64 rounded-b-3xl pt-20 px-5">
+		<View className="bg-accent w-full h-64 rounded-b-3xl pt-16 px-5">
 			<SafeAreaView className="flex-1">
 				{/* Date and Notification */}
 				<View className="flex-row justify-between items-center mb-4">

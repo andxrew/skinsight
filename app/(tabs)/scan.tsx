@@ -5,20 +5,23 @@ import {
 	TouchableOpacity,
 	SafeAreaView,
 	ScrollView,
+	Alert,
 } from "react-native"
-import {
-	CameraView,
-	CameraType,
-	useCameraPermissions,
-	CameraCapturedPicture,
-} from "expo-camera"
+import { CameraView, CameraType, useCameraPermissions } from "expo-camera"
+import * as ImagePicker from "expo-image-picker"
 import { router } from "expo-router"
-import { RotateCcw, Camera as CameraIcon } from "lucide-react-native"
+import {
+	RotateCcw,
+	Camera as CameraIcon,
+	Flashlight,
+	Image as ImageIcon,
+} from "lucide-react-native"
 
 export default function Scan() {
 	const [facing, setFacing] = useState<CameraType>("back")
+	const [flashOn, setFlashOn] = useState(false)
 	const [permission, requestPermission] = useCameraPermissions()
-	const ref = useRef<CameraView>(null) // ✅ Ref to CameraView
+	const ref = useRef<CameraView>(null)
 
 	const toggleCameraFacing = () => {
 		setFacing((current) => (current === "back" ? "front" : "back"))
@@ -35,10 +38,28 @@ export default function Scan() {
 		}
 	}
 
-	if (!permission) {
-		return <View />
+	const handleImageUpload = async () => {
+		const result = await ImagePicker.launchImageLibraryAsync({
+			mediaTypes: ImagePicker.MediaTypeOptions.Images,
+			base64: false,
+			allowsEditing: true,
+			quality: 1,
+		})
+
+		if (!result.canceled && result.assets[0]?.uri) {
+			console.log("Selected image:", result.assets[0].uri)
+			router.push({
+				pathname: "/preview",
+				params: { imageUri: result.assets[0].uri },
+			})
+		} else if (result.canceled) {
+			console.log("Image selection canceled")
+		} else {
+			Alert.alert("Error", "Failed to pick image.")
+		}
 	}
 
+	if (!permission) return <View />
 	if (!permission.granted) {
 		return (
 			<SafeAreaView className="flex-1 justify-center items-center bg-background">
@@ -72,9 +93,10 @@ export default function Scan() {
 				{/* Camera View */}
 				<View className="h-[450px] overflow-hidden rounded-3xl mx-5 mb-6">
 					<CameraView
-						ref={ref} // ✅ Ref attached here
+						ref={ref}
 						facing={facing}
-						mode="picture" // ✅ Picture mode
+						mode="picture"
+						enableTorch={flashOn}
 						style={{ flex: 1 }}
 						responsiveOrientationWhenOrientationLocked
 					>
@@ -94,15 +116,44 @@ export default function Scan() {
 							{/* Capture Button */}
 							<TouchableOpacity
 								className="bg-accent p-6 rounded-full"
-								onPress={handleCapture} // ✅ Now capture works!
+								onPress={handleCapture}
 							>
 								<CameraIcon
 									color="white"
 									size={32}
 								/>
 							</TouchableOpacity>
+
+							{/* Flashlight Toggle */}
+							<TouchableOpacity
+								className={`p-4 rounded-full ${
+									flashOn ? "bg-yellow-400/40" : "bg-white/30"
+								}`}
+								onPress={() => setFlashOn(!flashOn)}
+							>
+								<Flashlight
+									color="white"
+									size={28}
+								/>
+							</TouchableOpacity>
 						</View>
 					</CameraView>
+				</View>
+
+				{/* Upload Button */}
+				<View className="items-center mb-6">
+					<TouchableOpacity
+						onPress={handleImageUpload}
+						className="flex-row items-center gap-2 bg-accent px-6 py-4 rounded-2xl"
+					>
+						<ImageIcon
+							color="white"
+							size={24}
+						/>
+						<Text className="text-white text-lg font-bold">
+							Upload from Gallery
+						</Text>
+					</TouchableOpacity>
 				</View>
 
 				{/* Scan Tips */}

@@ -1,6 +1,13 @@
-import { View, Text, ActivityIndicator, SafeAreaView } from "react-native"
+import {
+	View,
+	Text,
+	ActivityIndicator,
+	SafeAreaView,
+	Alert,
+} from "react-native"
 import { useEffect, useState } from "react"
 import { useLocalSearchParams, router } from "expo-router"
+import * as FileSystem from "expo-file-system"
 
 export default function Analyzing() {
 	const [funnyMessage, setFunnyMessage] = useState<string>("")
@@ -22,38 +29,64 @@ export default function Analyzing() {
 		const randomMessage = messages[Math.floor(Math.random() * messages.length)]
 		setFunnyMessage(randomMessage)
 
-		// Randomize analyzing time (between 2-5 seconds)
-		const randomDelay = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000
+		analyzeImage()
+	}, [])
 
-		const timeout = setTimeout(() => {
+	const analyzeImage = async () => {
+		try {
+			// Read the image as base64
+			const base64Image = await FileSystem.readAsStringAsync(imageUri, {
+				encoding: FileSystem.EncodingType.Base64,
+			})
+
+			// Send image to backend API
+			const response = await fetch("http://192.168.0.33:5000/predict", {
+				// ⚠️ Replace with your local IP address (not 127.0.0.1)
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({ image: base64Image }),
+			})
+
+			const result = await response.json()
+
+			if (result.error) {
+				throw new Error(result.error)
+			}
+
+			// Navigate to results page with prediction and confidence
 			router.replace({
 				pathname: "/results",
-				params: { imageUri },
+				params: {
+					imageUri,
+					result: result.result,
+					confidence: result.confidence.toFixed(2), // Optional: round to 2 decimal places
+				},
 			})
-		}, randomDelay)
-
-		return () => clearTimeout(timeout)
-	}, [])
+		} catch (error) {
+			console.error("Prediction failed:", error)
+			Alert.alert(
+				"Prediction Error",
+				"Something went wrong while analyzing the image."
+			)
+		}
+	}
 
 	return (
 		<SafeAreaView className="flex-1 bg-background justify-center items-center px-6">
-			{/* Spinner */}
 			<ActivityIndicator
 				size="large"
 				color="#4169E1"
 			/>
 
-			{/* Main Analyzing Text */}
 			<Text className="text-accent text-2xl font-bold text-center mt-6">
 				Analyzing your scan...
 			</Text>
 
-			{/* Funny Message */}
 			<Text className="text-textSecondary text-center mt-4">
 				{funnyMessage}
 			</Text>
 		</SafeAreaView>
 	)
 }
-
-// ✅ Hide header from this screen (already handled in _layout.tsx)

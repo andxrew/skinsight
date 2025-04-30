@@ -1,56 +1,59 @@
-import { View, Text, TouchableOpacity, SafeAreaView } from "react-native"
+import { View, Text, TouchableOpacity, SafeAreaView, Image } from "react-native"
 import { useEffect, useState } from "react"
 import { router, useLocalSearchParams } from "expo-router"
 import { CheckCircle, XCircle } from "lucide-react-native"
 import { saveScanResult } from "@/utils/HistoryDatabase"
-import { v4 as uuidv4 } from "uuid"
-import * as Crypto from "expo-crypto" // ✅ HERE at top!
+import * as Crypto from "expo-crypto"
 
 // --- HELPERS ---
 async function generateUUID() {
-	return Crypto.randomUUID() // ✅ clean UUID generator
+	return Crypto.randomUUID()
 }
 
 export default function Results() {
-	const { imageUri } = useLocalSearchParams<{ imageUri: string }>()
+	const { imageUri, result, confidence } = useLocalSearchParams<{
+		imageUri: string
+		result: string
+		confidence: string
+	}>()
 
 	const [diagnosis, setDiagnosis] = useState<"Benign" | "Malignant">("Benign")
-	const [confidence, setConfidence] = useState<number | undefined>(undefined)
 
 	useEffect(() => {
-		if (imageUri === undefined) {
-			console.log("🚨 imageUri is undefined, returning early")
-			return
-		}
-
-		if (!imageUri) {
-			console.log("🚨 imageUri is empty, sending back to scan")
+		if (!imageUri || !result || !confidence) {
+			console.log("🚨 Missing params, sending back to scan")
 			router.replace("/scan")
 			return
 		}
 
-		console.log("✅ Valid imageUri received:", imageUri)
+		// Capitalize first letter to match "Benign" | "Malignant"
+		const formattedResult =
+			result.charAt(0).toUpperCase() + result.slice(1).toLowerCase()
 
-		const randomResult = Math.random() < 0.8 ? "Benign" : "Malignant"
-		const randomConfidence = Math.floor(Math.random() * 20) + 80
+		if (formattedResult !== "Benign" && formattedResult !== "Malignant") {
+			console.error("🔥 Invalid diagnosis result:", result)
+			return
+		}
 
+		setDiagnosis(formattedResult as "Benign" | "Malignant")
+
+		// Save to DB
 		;(async () => {
 			try {
-				const id = await generateUUID() // ✅ Use it here
+				const id = await generateUUID()
 				await saveScanResult({
 					id,
 					imageUri,
-					diagnosis: randomResult,
+					diagnosis: formattedResult as "Benign" | "Malignant",
+					confidence: parseFloat(confidence),
 					date: new Date().toISOString(),
-					confidence: randomConfidence,
 				})
-
-				console.log("✅ Scan saved after analyzing!")
+				console.log("✅ Scan saved successfully!")
 			} catch (error) {
-				console.error("🔥 Error during saving scan:", error)
+				console.error("🔥 Failed to save scan:", error)
 			}
 		})()
-	}, [imageUri])
+	}, [imageUri, result, confidence])
 
 	const handleNewScan = () => {
 		router.replace("/scan")
@@ -58,6 +61,13 @@ export default function Results() {
 
 	return (
 		<SafeAreaView className="flex-1 bg-background justify-center items-center px-6">
+			{/* Scanned Image */}
+			<Image
+				source={{ uri: imageUri }}
+				className="w-64 h-64 rounded-2xl mb-6"
+				resizeMode="cover"
+			/>
+
 			{/* Diagnosis Icon */}
 			{diagnosis === "Benign" ? (
 				<CheckCircle
@@ -73,19 +83,17 @@ export default function Results() {
 
 			{/* Diagnosis Text */}
 			<Text
-				className={`text-4xl font-bold text-center mt-8 ${
+				className={`text-4xl font-bold text-center mt-6 ${
 					diagnosis === "Benign" ? "text-success" : "text-error"
 				}`}
 			>
 				{diagnosis}
 			</Text>
 
-			{/* (Optional) Confidence */}
-			{confidence !== undefined && (
-				<Text className="text-textSecondary text-lg text-center mt-4">
-					Confidence: {confidence}%
-				</Text>
-			)}
+			{/* Confidence */}
+			<Text className="text-textSecondary text-lg text-center mt-4">
+				Confidence: {parseFloat(confidence).toFixed(2)}%
+			</Text>
 
 			{/* New Scan Button */}
 			<TouchableOpacity

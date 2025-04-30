@@ -1,7 +1,5 @@
 import HomeHeader from "@/components/HomeHeader"
 import { ScrollView, Text, View, TouchableOpacity } from "react-native"
-import { useEffect } from "react"
-import { initHistoryTable } from "@/utils/HistoryDatabase"
 
 const skinHealthTips = [
 	"Check your moles monthly for changes in size, color, or shape.",
@@ -33,7 +31,7 @@ export default function Index() {
 				<View className="px-5 flex-1">
 					{/* Welcome Message */}
 					<Text className=" flex-1 text-3xl font-bold text-accent justify-center text-center items-center mb-6 mt-4">
-						👋 Welcome back!
+						Skinsight
 					</Text>
 
 					{/* Last Scan Result */}
