@@ -1,9 +1,10 @@
 import { View, Text, ActivityIndicator, SafeAreaView } from "react-native"
 import { useEffect, useState } from "react"
-import { router } from "expo-router"
+import { useLocalSearchParams, router } from "expo-router"
 
 export default function Analyzing() {
 	const [funnyMessage, setFunnyMessage] = useState<string>("")
+	const { imageUri } = useLocalSearchParams<{ imageUri: string }>()
 
 	const messages = [
 		"Analyzing pixels...",
@@ -25,7 +26,10 @@ export default function Analyzing() {
 		const randomDelay = Math.floor(Math.random() * (5000 - 2000 + 1)) + 2000
 
 		const timeout = setTimeout(() => {
-			router.replace("/results")
+			router.replace({
+				pathname: "/results",
+				params: { imageUri },
+			})
 		}, randomDelay)
 
 		return () => clearTimeout(timeout)

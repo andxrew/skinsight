@@ -17,7 +17,10 @@ export default function Preview() {
 	}
 
 	const handleConfirm = () => {
-		router.push("/analyzing") // 🚀 (we'll build this analyzing page next)
+		router.push({
+			pathname: "/analyzing",
+			params: { imageUri },
+		}) // 🚀 (we'll build this analyzing page next)
 	}
 
 	return (

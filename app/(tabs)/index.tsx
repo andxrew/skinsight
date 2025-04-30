@@ -1,5 +1,7 @@
 import HomeHeader from "@/components/HomeHeader"
 import { ScrollView, Text, View, TouchableOpacity } from "react-native"
+import { useEffect } from "react"
+import { initHistoryTable } from "@/utils/HistoryDatabase"
 
 const skinHealthTips = [
 	"Check your moles monthly for changes in size, color, or shape.",
