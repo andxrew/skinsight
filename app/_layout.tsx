@@ -35,6 +35,10 @@ export default function RootLayout() {
 					name="results"
 					options={{ headerShown: false }}
 				/>
+				<Stack.Screen
+					name="education"
+					options={{ headerShown: false }}
+				/>
 			</Stack>
 		</ThemeProvider>
 	)
