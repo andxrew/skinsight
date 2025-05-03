@@ -4,16 +4,18 @@ import { router, useLocalSearchParams } from "expo-router"
 import { CheckCircle, XCircle } from "lucide-react-native"
 import { saveScanResult } from "@/utils/HistoryDatabase"
 import * as Crypto from "expo-crypto"
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 async function generateUUID() {
 	return Crypto.randomUUID()
 }
 
 export default function Results() {
-	const { imageUri, result, confidence } = useLocalSearchParams<{
+	const { imageUri, result, confidence, fromHistory } = useLocalSearchParams<{
 		imageUri: string
 		result: string
 		confidence: string
+		fromHistory?: string
 	}>()
 
 	const [diagnosis, setDiagnosis] = useState<"Benign" | "Malignant">("Benign")
@@ -34,23 +36,26 @@ export default function Results() {
 		}
 
 		setDiagnosis(formattedResult as "Benign" | "Malignant")
-		;(async () => {
-			try {
-				const id = await generateUUID()
-				await saveScanResult({
-					id,
-					imageUri,
-					diagnosis: formattedResult as "Benign" | "Malignant",
-					confidence: parseFloat(confidence),
-					date: new Date().toISOString(),
-				})
-				console.log("✅ Scan saved successfully!")
-			} catch (error) {
-				console.error("🔥 Failed to save scan:", error)
-			}
-		})()
-	}, [imageUri, result, confidence])
 
+		// ✅ Only save if not coming from history
+		if (fromHistory !== "true") {
+			;(async () => {
+				try {
+					const id = await generateUUID()
+					await saveScanResult({
+						id,
+						imageUri,
+						diagnosis: formattedResult as "Benign" | "Malignant",
+						confidence: parseFloat(confidence),
+						date: new Date().toISOString(),
+					})
+					console.log("✅ Scan saved successfully!")
+				} catch (error) {
+					console.error("🔥 Failed to save scan:", error)
+				}
+			})()
+		}
+	}, [imageUri, result, confidence, fromHistory])
 	const handleNewScan = () => {
 		router.replace("/scan")
 	}

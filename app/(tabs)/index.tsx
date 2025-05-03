@@ -1,9 +1,10 @@
 import HomeHeader from "@/components/HomeHeader"
 import { router } from "expo-router"
 import { ScrollView, Text, View, TouchableOpacity } from "react-native"
-import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useEffect, useState } from "react"
-import { loadScanHistory } from "@/utils/HistoryDatabase"
+import { loadLatestScan, ScanResult } from "@/utils/HistoryDatabase"
+import { useFocusEffect } from "@react-navigation/native"
+import { useCallback } from "react"
 
 const skinHealthTips = [
 	"Check your moles monthly for changes in size, color, or shape.",
@@ -32,30 +33,32 @@ export default function Index() {
 	const [daysUntilNextScan, setDaysUntilNextScan] = useState<number | null>(
 		null
 	)
-	useEffect(() => {
-		const checkLastScanDate = async () => {
-			try {
-				const scans = await loadScanHistory()
-				if (scans.length === 0) {
-					setDaysUntilNextScan(-1) // signal for no scans
-					return
+	const [lastScan, setLastScan] = useState<ScanResult | null>(null)
+	useFocusEffect(
+		useCallback(() => {
+			const fetchLastScanAndReminder = async () => {
+				try {
+					const latest = await loadLatestScan()
+					setLastScan(latest)
+
+					if (latest) {
+						const lastScanDate = new Date(latest.date)
+						const now = new Date()
+						const diffTime = now.getTime() - lastScanDate.getTime()
+						const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+						const daysLeft = 30 - diffDays
+						setDaysUntilNextScan(daysLeft > 0 ? daysLeft : 0)
+					} else {
+						setDaysUntilNextScan(-1)
+					}
+				} catch (error) {
+					console.error("Failed to refresh last scan:", error)
 				}
-
-				const lastScan = new Date(scans[0].date)
-				const now = new Date()
-
-				const diffTime = now.getTime() - lastScan.getTime()
-				const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
-
-				const daysLeft = 30 - diffDays
-				setDaysUntilNextScan(daysLeft > 0 ? daysLeft : 0)
-			} catch (error) {
-				console.error("Error checking scan date:", error)
 			}
-		}
 
-		checkLastScanDate()
-	}, [])
+			fetchLastScanAndReminder()
+		}, [])
+	)
 
 	return (
 		<View className="flex-1 bg-background dark:bg-black">
@@ -74,17 +77,52 @@ export default function Index() {
 					</Text> */}
 
 					{/* Last Scan Result */}
-					<View className="bg-surface dark:bg-[#1a1a1a] rounded-2xl p-5 mb-6 shadow">
-						<Text className="text-lg text-center font-semibold text-textPrimary dark:text-white mb-2">
-							🩺 Last Scan
-						</Text>
-						<Text className="text-2xl font-bold text-success text-center">
-							Benign
-						</Text>
-						<TouchableOpacity className="mt-3">
-							<Text className="text-accent text-center">View Full Report</Text>
-						</TouchableOpacity>
-					</View>
+					{lastScan ? (
+						<View className="bg-surface dark:bg-[#1a1a1a] rounded-2xl p-5 mb-6 shadow">
+							<Text className="text-lg text-center font-semibold text-textPrimary dark:text-white mb-2">
+								🩺 Last Scan
+							</Text>
+							<Text
+								className={`text-2xl font-bold text-center ${
+									lastScan.diagnosis === "Benign"
+										? "text-success"
+										: "text-error"
+								}`}
+							>
+								{lastScan.diagnosis}
+							</Text>
+							<Text className="text-textSecondary dark:text-gray-400 text-center">
+								Confidence: {lastScan.confidence ?? "N/A"}%
+							</Text>
+							<TouchableOpacity
+								className="mt-3"
+								onPress={() =>
+									router.push({
+										pathname: "/results",
+										params: {
+											imageUri: lastScan.imageUri,
+											result: lastScan.diagnosis,
+											confidence: String(lastScan.confidence ?? 0),
+											fromHistory: "true", // ✅ add this
+										},
+									})
+								}
+							>
+								<Text className="text-accent text-center">
+									View Full Report
+								</Text>
+							</TouchableOpacity>
+						</View>
+					) : (
+						<View className="bg-surface dark:bg-[#1a1a1a] rounded-2xl p-5 mb-6 shadow items-center">
+							<Text className="text-lg font-semibold text-textPrimary dark:text-white text-center">
+								🩺 No scans yet.
+							</Text>
+							<Text className="text-textSecondary dark:text-gray-400 text-center mt-1">
+								Start your first scan to see results here.
+							</Text>
+						</View>
+					)}
 
 					{/* Health Tip */}
 					<View className="bg-surface dark:bg-[#1a1a1a] p-5 rounded-2xl mb-6 shadow">

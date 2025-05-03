@@ -73,6 +73,19 @@ export async function loadScanHistory(): Promise<ScanResult[]> {
 	return result // ✅ result itself is the ScanResult[]
 }
 
+// Load only the latest scan
+export async function loadLatestScan(): Promise<ScanResult | null> {
+	if (!db) {
+		db = await SQLite.openDatabaseAsync("skinsight.db")
+	}
+
+	const result = await db.getFirstAsync<ScanResult>(
+		`SELECT * FROM scans ORDER BY date DESC LIMIT 1;`
+	)
+
+	return result ?? null
+}
+
 // Clear History
 export async function clearScanHistory() {
 	if (!db) {

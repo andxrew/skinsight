@@ -8,7 +8,7 @@ import {
 	FlatList,
 } from "react-native"
 import { loadScanHistory, ScanResult } from "@/utils/HistoryDatabase"
-import { useFocusEffect } from "expo-router" // 🔁 Trigger refresh when screen is focused
+import { router, useFocusEffect } from "expo-router"
 
 export default function History() {
 	const [history, setHistory] = useState<ScanResult[]>([])
@@ -86,65 +86,80 @@ export default function History() {
 					</Text>
 				)}
 				renderItem={({ item }) => (
-					<View className="bg-surface dark:bg-[#1a1a1a] mx-5 mb-5 rounded-2xl shadow-lg">
-						<TouchableOpacity>
+					<TouchableOpacity
+						onPress={() =>
+							router.push({
+								pathname: "/results",
+								params: {
+									imageUri: item.imageUri,
+									result: item.diagnosis,
+									confidence: String(item.confidence ?? 0),
+									fromHistory: "true", // 👈 prevents re-saving
+								},
+							})
+						}
+					>
+						<View className="bg-surface dark:bg-[#1a1a1a] mx-5 mb-5 rounded-2xl shadow-lg">
+							{/* Image */}
 							<Image
 								source={{ uri: item.imageUri }}
 								className="w-full h-48 rounded-t-2xl"
 							/>
-						</TouchableOpacity>
 
-						<View className="p-5">
-							<Text className="text-xl font-bold text-accent mb-2">
-								{item.diagnosis}
-							</Text>
-							<Text className="text-textSecondary dark:text-gray-400 mb-2">
-								Confidence: {item.confidence}%
-							</Text>
-							<Text className="text-textSecondary dark:text-gray-400">
-								Scanned on: {new Date(item.date).toLocaleDateString()}
-							</Text>
+							{/* Details */}
+							<View className="p-5">
+								<Text className="text-xl font-bold text-accent mb-2">
+									{item.diagnosis}
+								</Text>
+								<Text className="text-textSecondary dark:text-gray-400 mb-2">
+									Confidence: {item.confidence}%
+								</Text>
+								<Text className="text-textSecondary dark:text-gray-400">
+									Scanned on: {new Date(item.date).toLocaleDateString()}
+								</Text>
 
-							{/* Tags */}
-							<View className="flex-row flex-wrap mt-3">
-								{tags[item.id]?.map((tag, index) => (
+								{/* Tags */}
+								<View className="flex-row flex-wrap mt-3">
+									{tags[item.id]?.map((tag, index) => (
+										<TouchableOpacity
+											key={index}
+											onPress={() => handleDeleteTag(item.id, tag)}
+											className="bg-accent px-3 py-1 rounded-full mr-2 mb-2"
+										>
+											<Text className="text-white">{tag}</Text>
+										</TouchableOpacity>
+									))}
+								</View>
+
+								{/* Tag Input */}
+								<View className="flex-row mt-2">
+									<TextInput
+										value={newTags[item.id] || ""}
+										onChangeText={(text) =>
+											setNewTags((prev) => ({ ...prev, [item.id]: text }))
+										}
+										placeholder="Add a tag"
+										placeholderTextColor="#9CA3AF"
+										className="bg-gray-200 dark:bg-gray-700 dark:text-white rounded-lg p-3 flex-1"
+									/>
 									<TouchableOpacity
-										key={index}
-										onPress={() => handleDeleteTag(item.id, tag)}
-										className="bg-accent px-3 py-1 rounded-full mr-2 mb-2"
+										onPress={() => handleAddTag(item.id)}
+										className="bg-accent ml-2 p-3 rounded-lg"
 									>
-										<Text className="text-white">{tag}</Text>
+										<Text className="text-white">Add</Text>
 									</TouchableOpacity>
-								))}
+								</View>
 							</View>
 
-							{/* Tag Input */}
-							<View className="flex-row mt-2">
-								<TextInput
-									value={newTags[item.id] || ""}
-									onChangeText={(text) =>
-										setNewTags((prev) => ({ ...prev, [item.id]: text }))
-									}
-									placeholder="Add a tag"
-									placeholderTextColor="#9CA3AF"
-									className="bg-gray-200 dark:bg-gray-700 dark:text-white rounded-lg p-3 flex-1"
-								/>
-								<TouchableOpacity
-									onPress={() => handleAddTag(item.id)}
-									className="bg-accent ml-2 p-3 rounded-lg"
-								>
-									<Text className="text-white">Add</Text>
-								</TouchableOpacity>
-							</View>
+							{/* Delete Button */}
+							<TouchableOpacity
+								onPress={() => handleDeleteScan(item.id)}
+								className="bg-red-500 p-4 rounded-b-2xl items-center"
+							>
+								<Text className="text-white font-bold">Delete</Text>
+							</TouchableOpacity>
 						</View>
-
-						<TouchableOpacity
-							onPress={() => handleDeleteScan(item.id)}
-							className="bg-red-500 p-4 rounded-b-2xl items-center"
-						>
-							<Text className="text-white font-bold">Delete</Text>
-						</TouchableOpacity>
-					</View>
+					</TouchableOpacity>
 				)}
 				contentContainerStyle={{ paddingBottom: 100 }}
 			/>

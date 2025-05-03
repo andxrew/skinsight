@@ -38,7 +38,7 @@ export default function Settings() {
 	}
 
 	const handleContact = () => {
-		const email = "yourname@example.com" // Replace with your email
+		const email = "22467921@stu.mmu.ac.cuk"
 		const subject = "Skinsight Feedback"
 		const body =
 			"Hi,\n\nI'd like to share some feedback about the Skinsight app...\n"
