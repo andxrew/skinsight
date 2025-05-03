@@ -1,4 +1,5 @@
 import HomeHeader from "@/components/HomeHeader"
+import { router } from "expo-router"
 import { ScrollView, Text, View, TouchableOpacity } from "react-native"
 
 const skinHealthTips = [
@@ -13,6 +14,10 @@ const skinHealthTips = [
 	"Moisturize regularly to maintain your skin barrier.",
 	"Perform self-examinations in front of a mirror under good lighting.",
 ]
+
+const handleNewScan = () => {
+	router.replace("/scan")
+}
 
 export default function Index() {
 	const randomTip =
@@ -69,7 +74,10 @@ export default function Index() {
 					</View>
 
 					{/* New Scan Button */}
-					<TouchableOpacity className="bg-accent rounded-2xl py-4 items-center">
+					<TouchableOpacity
+						className="bg-accent rounded-2xl py-4 items-center"
+						onPress={handleNewScan}
+					>
 						<Text className="text-white font-bold text-lg">Start New Scan</Text>
 					</TouchableOpacity>
 

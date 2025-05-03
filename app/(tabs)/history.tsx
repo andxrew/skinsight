@@ -6,22 +6,14 @@ import {
 	TextInput,
 	TouchableOpacity,
 	FlatList,
-	Alert,
 } from "react-native"
-import {
-	loadScanHistory,
-	ScanResult,
-	clearScanHistory,
-} from "@/utils/HistoryDatabase"
+import { loadScanHistory, ScanResult } from "@/utils/HistoryDatabase"
+import { useFocusEffect } from "expo-router" // 🔁 Trigger refresh when screen is focused
 
 export default function History() {
 	const [history, setHistory] = useState<ScanResult[]>([])
 	const [tags, setTags] = useState<Record<string, string[]>>({})
 	const [newTags, setNewTags] = useState<Record<string, string>>({})
-
-	useEffect(() => {
-		fetchHistory()
-	}, [])
 
 	const fetchHistory = async () => {
 		try {
@@ -39,6 +31,12 @@ export default function History() {
 			console.error("Failed to load scan history:", error)
 		}
 	}
+
+	useFocusEffect(
+		useCallback(() => {
+			fetchHistory()
+		}, [])
+	)
 
 	const handleAddTag = (scanId: string) => {
 		if (!newTags[scanId].trim()) return
@@ -71,10 +69,6 @@ export default function History() {
 		}
 	}
 
-	const onRefresh = useCallback(() => {
-		fetchHistory()
-	}, [])
-
 	return (
 		<View className="flex-1 bg-background dark:bg-black">
 			<FlatList
@@ -84,6 +78,11 @@ export default function History() {
 				ListHeaderComponent={() => (
 					<Text className="text-3xl font-bold text-accent dark:text-white text-center mb-8 pt-10">
 						Scan History
+					</Text>
+				)}
+				ListEmptyComponent={() => (
+					<Text className="text-center text-textSecondary dark:text-gray-400 mt-10">
+						No scan history yet.
 					</Text>
 				)}
 				renderItem={({ item }) => (
