@@ -40,7 +40,7 @@ or
 ```
 npm install --legacy-peer-deps
 ```
-> 🛠️ If prompted with version conflicts or dependency issues, use the --legacy-peer-deps flag to bypass strict version resolutions. This is due to Expo Go releasing a new version (SDK 53) right before the submission deadline.
+> 🛠️ If prompted with version conflicts or dependency issues, use the --legacy-peer-deps flag to bypass strict version conflicts. This is due to Expo Go releasing a new version (SDK 53) right before the submission deadline.
 
 Start the Expo development server:
 ```
