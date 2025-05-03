@@ -1,6 +1,9 @@
 import HomeHeader from "@/components/HomeHeader"
 import { router } from "expo-router"
 import { ScrollView, Text, View, TouchableOpacity } from "react-native"
+import AsyncStorage from "@react-native-async-storage/async-storage"
+import { useEffect, useState } from "react"
+import { loadScanHistory } from "@/utils/HistoryDatabase"
 
 const skinHealthTips = [
 	"Check your moles monthly for changes in size, color, or shape.",
@@ -19,9 +22,40 @@ const handleNewScan = () => {
 	router.replace("/scan")
 }
 
+const handleNewEd = () => {
+	router.push("/education")
+}
 export default function Index() {
 	const randomTip =
 		skinHealthTips[Math.floor(Math.random() * skinHealthTips.length)]
+
+	const [daysUntilNextScan, setDaysUntilNextScan] = useState<number | null>(
+		null
+	)
+	useEffect(() => {
+		const checkLastScanDate = async () => {
+			try {
+				const scans = await loadScanHistory()
+				if (scans.length === 0) {
+					setDaysUntilNextScan(-1) // signal for no scans
+					return
+				}
+
+				const lastScan = new Date(scans[0].date)
+				const now = new Date()
+
+				const diffTime = now.getTime() - lastScan.getTime()
+				const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24))
+
+				const daysLeft = 30 - diffDays
+				setDaysUntilNextScan(daysLeft > 0 ? daysLeft : 0)
+			} catch (error) {
+				console.error("Error checking scan date:", error)
+			}
+		}
+
+		checkLastScanDate()
+	}, [])
 
 	return (
 		<View className="flex-1 bg-background dark:bg-black">
@@ -63,15 +97,28 @@ export default function Index() {
 					</View>
 
 					{/* Next Scan Reminder */}
-					<View className="bg-surface dark:bg-[#1a1a1a] p-5 rounded-2xl mb-6 shadow items-center">
-						<Text className="text-lg font-semibold text-textPrimary dark:text-white mb-2">
-							⏰ Next Scan Reminder
-						</Text>
-						<Text className="text-textSecondary dark:text-gray-400 text-center">
-							Your next recommended scan is in{" "}
-							<Text className="text-accent font-bold">5 days</Text>.
-						</Text>
-					</View>
+					{daysUntilNextScan !== null && (
+						<View className="bg-surface dark:bg-[#1a1a1a] p-5 rounded-2xl mb-6 shadow items-center">
+							<Text className="text-lg font-semibold text-textPrimary dark:text-white mb-2">
+								⏰ Next Scan Reminder
+							</Text>
+							{daysUntilNextScan === -1 ? (
+								<Text className="text-textSecondary dark:text-gray-400 text-center">
+									You haven't scanned yet. Start your first scan today!
+								</Text>
+							) : (
+								<Text className="text-textSecondary dark:text-gray-400 text-center">
+									Your next recommended scan is in{" "}
+									<Text className="text-accent font-bold">
+										{daysUntilNextScan === 0
+											? "today"
+											: `${daysUntilNextScan} day(s)`}
+									</Text>
+									.
+								</Text>
+							)}
+						</View>
+					)}
 
 					{/* New Scan Button */}
 					<TouchableOpacity
@@ -83,7 +130,10 @@ export default function Index() {
 
 					{/* Learn More Button */}
 					<TouchableOpacity className="p-5 rounded-2xl items-center mb-6">
-						<Text className="text-accent text-base font-semibold">
+						<Text
+							className="text-accent text-base font-semibold"
+							onPress={handleNewEd}
+						>
 							Learn more about early skin cancer signs
 						</Text>
 					</TouchableOpacity>
