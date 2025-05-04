@@ -70,7 +70,7 @@ import {
 	TouchableOpacity,
 } from "react-native"
 
-import { Bell, Search } from "lucide-react-native" // ✅ Import Lucide icons
+import { Bell, Search } from "lucide-react-native"
 
 const HomeHeader = () => {
 	const today = new Date()
@@ -109,13 +109,6 @@ const HomeHeader = () => {
 
 				{/* Greeting */}
 				<View className="flex-row items-center">
-					{/* Optional Profile Picture */}
-					{/* 
-            <Image
-              source={{ uri: "https://randomuser.me/api/portraits/women/44.jpg" }}
-              className="w-12 h-12 rounded-full mr-3"
-            /> 
-            */}
 					<View>
 						<Text className="text-white text-2xl font-semibold">
 							Hi, User! 👋

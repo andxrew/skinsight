@@ -37,7 +37,7 @@ export default function Results() {
 
 		setDiagnosis(formattedResult as "Benign" | "Malignant")
 
-		// ✅ Only save if not coming from history
+		// Only save if not coming from history
 		if (fromHistory !== "true") {
 			;(async () => {
 				try {

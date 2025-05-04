@@ -11,6 +11,7 @@ export interface ScanResult {
 	diagnosis: "Benign" | "Malignant"
 	date: string
 	confidence?: number
+	tags?: string[]
 }
 
 // Initialize Database
@@ -19,6 +20,9 @@ export async function initHistoryTable() {
 		db = await SQLite.openDatabaseAsync("skinsight.db")
 	}
 
+	// Add 'tags' column if it doesn't already exist
+	await db!.runAsync(`ALTER TABLE scans ADD COLUMN tags TEXT;`).catch(() => {})
+
 	await db.withTransactionAsync(async () => {
 		await db!.runAsync(`
       CREATE TABLE IF NOT EXISTS scans (
@@ -26,7 +30,8 @@ export async function initHistoryTable() {
         imageUri TEXT,
         diagnosis TEXT,
         date TEXT,
-        confidence INTEGER
+        confidence INTEGER,
+        tags TEXT
       );
     `)
 	})
@@ -34,31 +39,38 @@ export async function initHistoryTable() {
 
 // Save a Scan
 export async function saveScanResult(scan: ScanResult) {
-	console.log("🛠 Attempting to save scan to DB:", scan)
-
 	if (!db) {
-		console.log("⚠️ DB is null, opening DB...")
 		db = await SQLite.openDatabaseAsync("skinsight.db")
 	}
 
 	try {
 		await db.withTransactionAsync(async () => {
-			console.log("🚀 Starting DB transaction...")
 			await db!.runAsync(
-				`INSERT INTO scans (id, imageUri, diagnosis, date, confidence) VALUES (?, ?, ?, ?, ?);`,
+				`INSERT INTO scans (id, imageUri, diagnosis, date, confidence, tags) VALUES (?, ?, ?, ?, ?, ?);`,
 				[
 					scan.id,
 					scan.imageUri,
 					scan.diagnosis,
 					scan.date,
 					scan.confidence ?? null,
+					JSON.stringify(scan.tags ?? []), // Save as JSON string
 				]
 			)
-			console.log("✅ Scan INSERTED into database successfully!")
 		})
 	} catch (error) {
 		console.error("🔥 Error saving scan to DB:", error)
 	}
+}
+
+// Update Tags for Existing Scan
+export async function updateScanTags(scanId: string, tags: string[]) {
+	if (!db) db = await SQLite.openDatabaseAsync("skinsight.db")
+	await db.withTransactionAsync(async () => {
+		await db!.runAsync(`UPDATE scans SET tags = ? WHERE id = ?;`, [
+			JSON.stringify(tags),
+			scanId,
+		])
+	})
 }
 
 // Load History
@@ -67,10 +79,13 @@ export async function loadScanHistory(): Promise<ScanResult[]> {
 		db = await SQLite.openDatabaseAsync("skinsight.db")
 	}
 
-	const result = await db.getAllAsync<ScanResult>(
+	const result = await db.getAllAsync<any>(
 		`SELECT * FROM scans ORDER BY date DESC;`
 	)
-	return result // ✅ result itself is the ScanResult[]
+	return result.map((scan) => ({
+		...scan,
+		tags: scan.tags ? JSON.parse(scan.tags) : [],
+	}))
 }
 
 // Load only the latest scan
@@ -79,11 +94,15 @@ export async function loadLatestScan(): Promise<ScanResult | null> {
 		db = await SQLite.openDatabaseAsync("skinsight.db")
 	}
 
-	const result = await db.getFirstAsync<ScanResult>(
+	const result = await db.getFirstAsync<any>(
 		`SELECT * FROM scans ORDER BY date DESC LIMIT 1;`
 	)
+	if (!result) return null
 
-	return result ?? null
+	return {
+		...result,
+		tags: result.tags ? result.tags.split(",") : [],
+	}
 }
 
 // Clear History

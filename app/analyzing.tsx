@@ -25,7 +25,7 @@ export default function Analyzing() {
 	]
 
 	useEffect(() => {
-		// Pick a random funny message
+		// Pck from messafes array
 		const randomMessage = messages[Math.floor(Math.random() * messages.length)]
 		setFunnyMessage(randomMessage)
 
@@ -41,7 +41,8 @@ export default function Analyzing() {
 
 			// Send image to backend API
 			const response = await fetch("http://192.168.0.33:5000/predict", {
-				// ⚠️ Replace with your local IP address (not 127.0.0.1)
+				//  Replace with your local IPv4 address
+
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -61,7 +62,7 @@ export default function Analyzing() {
 				params: {
 					imageUri,
 					result: result.result,
-					confidence: result.confidence.toFixed(2), // Optional: round to 2 decimal places
+					confidence: result.confidence.toFixed(2),
 				},
 			})
 		} catch (error) {

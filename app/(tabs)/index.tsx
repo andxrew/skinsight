@@ -84,9 +84,9 @@ export default function Index() {
 							</Text>
 							<Text
 								className={`text-2xl font-bold text-center ${
-									lastScan.diagnosis === "Benign"
-										? "text-success"
-										: "text-error"
+									lastScan.diagnosis === "Malignant"
+										? "text-red-500"
+										: "text-success"
 								}`}
 							>
 								{lastScan.diagnosis}
@@ -103,7 +103,7 @@ export default function Index() {
 											imageUri: lastScan.imageUri,
 											result: lastScan.diagnosis,
 											confidence: String(lastScan.confidence ?? 0),
-											fromHistory: "true", // ✅ add this
+											fromHistory: "true",
 										},
 									})
 								}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useCallback } from "react"
 import {
 	View,
 	Text,
@@ -7,7 +7,12 @@ import {
 	TouchableOpacity,
 	FlatList,
 } from "react-native"
-import { loadScanHistory, ScanResult } from "@/utils/HistoryDatabase"
+import {
+	loadScanHistory,
+	ScanResult,
+	updateScanTags,
+	clearSingleScan,
+} from "@/utils/HistoryDatabase"
 import { router, useFocusEffect } from "expo-router"
 
 export default function History() {
@@ -22,7 +27,7 @@ export default function History() {
 			const initialTags: Record<string, string[]> = {}
 			const initialNewTags: Record<string, string> = {}
 			scans.forEach((scan) => {
-				initialTags[scan.id] = []
+				initialTags[scan.id] = scan.tags ?? []
 				initialNewTags[scan.id] = ""
 			})
 			setTags(initialTags)
@@ -38,35 +43,24 @@ export default function History() {
 		}, [])
 	)
 
-	const handleAddTag = (scanId: string) => {
-		if (!newTags[scanId].trim()) return
-		setTags((prevTags) => ({
-			...prevTags,
-			[scanId]: [...prevTags[scanId], newTags[scanId]],
-		}))
-		setNewTags((prevTags) => ({
-			...prevTags,
-			[scanId]: "",
-		}))
+	const handleAddTag = async (scanId: string) => {
+		if (!newTags[scanId]?.trim()) return
+
+		const updatedTags = [...(tags[scanId] || []), newTags[scanId]]
+		setTags((prev) => ({ ...prev, [scanId]: updatedTags }))
+		setNewTags((prev) => ({ ...prev, [scanId]: "" }))
+		await updateScanTags(scanId, updatedTags)
 	}
 
-	const handleDeleteTag = (scanId: string, tag: string) => {
-		setTags((prevTags) => ({
-			...prevTags,
-			[scanId]: prevTags[scanId].filter((t) => t !== tag),
-		}))
+	const handleDeleteTag = async (scanId: string, tag: string) => {
+		const updatedTags = tags[scanId]?.filter((t) => t !== tag) || []
+		setTags((prev) => ({ ...prev, [scanId]: updatedTags }))
+		await updateScanTags(scanId, updatedTags)
 	}
 
 	const handleDeleteScan = async (id: string) => {
-		try {
-			const db = await require("expo-sqlite").openDatabaseAsync("skinsight.db")
-			await db.withTransactionAsync(async () => {
-				await db.runAsync(`DELETE FROM scans WHERE id = ?;`, [id])
-			})
-			fetchHistory()
-		} catch (error) {
-			console.error("Failed to delete scan:", error)
-		}
+		await clearSingleScan(id)
+		fetchHistory()
 	}
 
 	return (
@@ -94,19 +88,17 @@ export default function History() {
 									imageUri: item.imageUri,
 									result: item.diagnosis,
 									confidence: String(item.confidence ?? 0),
-									fromHistory: "true", // 👈 prevents re-saving
+									fromHistory: "true",
 								},
 							})
 						}
 					>
 						<View className="bg-surface dark:bg-[#1a1a1a] mx-5 mb-5 rounded-2xl shadow-lg">
-							{/* Image */}
 							<Image
 								source={{ uri: item.imageUri }}
 								className="w-full h-48 rounded-t-2xl"
 							/>
 
-							{/* Details */}
 							<View className="p-5">
 								<Text className="text-xl font-bold text-accent mb-2">
 									{item.diagnosis}
@@ -151,7 +143,6 @@ export default function History() {
 								</View>
 							</View>
 
-							{/* Delete Button */}
 							<TouchableOpacity
 								onPress={() => handleDeleteScan(item.id)}
 								className="bg-red-500 p-4 rounded-b-2xl items-center"
