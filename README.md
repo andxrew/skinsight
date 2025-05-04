@@ -28,7 +28,7 @@ Skinsight is a cross-platform mobile application designed to help users analyze 
 
 ### 1. 📦 Clone the Repository
 ```
-git clone https://github.com/yourusername/skinsight.git
+git clone https://github.com/andxrewz/skinsight.git
 cd skinsight
 ```
 ### 2. 📱 Mobile App Setup (React Native + Expo)
