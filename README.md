@@ -31,7 +31,7 @@ Skinsight is a cross-platform mobile application designed to help users analyze 
 git clone https://github.com/yourusername/skinsight.git
 cd skinsight
 ```
-2. 📱 Mobile App Setup (React Native + Expo)
+### 2. 📱 Mobile App Setup (React Native + Expo)
 Install dependencies:
 ```
 npm install
@@ -40,7 +40,7 @@ or
 ```
 npm install --legacy-peer-deps
 ```
-> 🛠️ If prompted with version conflicts or dependency issues, use the --legacy-peer-deps flag to bypass strict version resolutions. This is due to Expo Go releasing a new version (SDK 53) right before the submission deadline.
+> 🛠️ If prompted with version conflicts or dependency issues, use the --legacy-peer-deps flag to bypass strict version conflicts. This is due to Expo Go releasing a new version (SDK 53) right before the submission deadline.
 
 Start the Expo development server:
 ```
@@ -49,7 +49,7 @@ npx expo start
 Install Expo Go App, Sign in and Connect to application.
 Make sure to test on a physical device or emulator with camera access.
 
-3. 🔧 Backend (Flask API) Setup
+### 3. 🔧 Backend (Flask API) Setup
 Navigate to the backend folder:
 ```
 cd backend
@@ -77,7 +77,7 @@ To connect the React Native app to the backend server, update the IP address in 
 > In analyzing.tsx replace the ip address to your machines ip address in the fetch call
 ``` 
 // Send image to backend API
-			const response = await fetch("http://192.168.0.33:5000/predict", { // ⚠️ Replace with your local IPv4 address
+			const response = await fetch("http://192.168.0.33:5000/predict", { // ⚠️ Replace with your local IPv4 address eg http://192.168.0.33:5000
 				
 				method: "POST",
 				headers: {
@@ -91,7 +91,7 @@ Ensure Your Mobile Device Is on the Same Network
 > ⚠️ Keep this Flask server running while using the app. It handles image analysis requests via an HTTP API, (Local Server in which the ML is hosted 
  and the app uses and API call to fetch from it.
 
-📁 Project Structure
+## 📁 Project Structure
 ```
 skinsight/
 ├── app/                    # React Native frontend, App routing
@@ -100,11 +100,12 @@ skinsight/
 │   ├── app.py              # Flask API
 │   ├── mobilenetv2_skin_lesion.h5  # Pretrained model
 ├── utils/              # Helpers (Database, Model integration)
-├── components/         # React Reusable components 
+├── components/         # React Reusable components
+├── ML notebook 	# Model experimentations and fine tuning
 ├── Config Files etc
 ```
 
-📌 Future Improvements
+## 📌 Future Improvements
 - Add user authentication
 
 - Add user accounts
@@ -115,3 +116,10 @@ skinsight/
 
 - Integration with calendar reminders
 
+- Improve ML Model confidence and try to tackle overfitting more
+
+## 🎥 Demo Screenshots
+
+## 🙏 Acknowledgements
+
+- **Dataset**: [ISIC 2020 Challenge Dataset](https://challenge.isic-archive.com/)
